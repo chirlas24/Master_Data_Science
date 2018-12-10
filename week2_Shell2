@@ -1,0 +1,686 @@
+  152  cd Data/shell
+  153  ls
+  154  cat Text_example.txt
+  155  cat -l Text_example.txt
+  156  cat -n Text_example.txt
+  157  cd
+  158  c
+  159  sudo apt-get install unrar
+  160  sudo apt-get install rar
+  161  c
+  162  cd
+  163  mkdir firs_dir
+  164  ls
+  165  cd firs_dir
+  166  touch text_file.txt
+  167  ls
+  168  chmod 212
+  169  chmod 212 text_file.txt
+  170  ls -l text_file.txt
+  171  mkdir sub1 sub2 text_file
+  172  ls
+  173  mv text_file.txt text_file
+  174  ls
+  175  cd text_file
+  176  ls
+  177  cd ,
+  178  cd .
+  179  cd ./
+  180  cd ..
+  181  mv text_file/text_file.txt sub2/text_file.txt.2
+  182  cd sub2
+  183  ls
+  184  cd ..
+  185  cp sub1 sub3/
+  186  cp sub1/ sub2
+  187  cp -r sub1/ sub3/
+  188  ls
+  189  cd sub3
+  190  ls
+  191  cp -r sub1 sub3
+  192  cd ..
+  193  cp -r sub1 sub3
+  194  ls
+  195  cd sub1
+  196  ls
+  197  cd ..
+  198  cd sub3
+  199  ls
+  200  cd ..
+  201  cd sub2
+  202  mv text_file.txt.2 text_file.txt.backup
+  203  ls
+  204  mv text_file.txt.backup ../.text_file.txt.backup
+  205  cd ..
+  206  ls
+  207  ls .
+  208  rv sub2
+  209  rm sub2
+  210  rm -r sub2
+  211  ls
+  212  cd
+  213  c
+  214  cd data
+  215  cd Data
+  216  cd shell
+  217  less Finn.txt
+  218  cd
+  219  cd Data/opentraveldata/optd_aircraft.csv
+  220  cd Data
+  221  cd opentraveldata
+  222  ls
+  223  less optd_aircraft.csv
+  224  cd
+  225  help tree
+  226  tree help
+  227  tree Data
+  228  tree -f Data
+  229  sudo apt-get install tree
+  230  c
+  231  man tree
+  232  tree -L 2
+  233  c
+  234  cd Data/shell
+  235  ls
+  236  cat -n Text_example.txt
+  237  cat -n Text_example.txt | wc >> Text_example_lines
+  238  ls
+  239  mv Text_example_lines Text_example_lines.txt
+  240  ls
+  241  less Text_example_lines.txt
+  242  cat -n Text_example.txt >> Text_example_lines.txt
+  243  ls
+  244  cat Text_example_lines.txt
+  245  cat -n Text_example.txt
+  246  cat Text_example.txt
+  247  cat Text_example.txt >> Text_example_double
+  248  cat Text_example.txt > Text_example_double
+  249  cat Text_example_double
+  250  rv Text_example_double
+  251  rm Text_example_double
+  252  ls
+  253  cat Text_example.txt >> Text_double.txt
+  254  ls
+  255  cat Text_double.txt
+  256  cat Text_example.txt > Text_double.txt
+  257  cat Text_double.txt
+  258  cat Text_example.txt >> Text_double.txt
+  259  cat Text_double.txt
+  260  zsh
+  261  cd
+  262  cd shell
+  263  cd Data/shell
+  264  cat Text_example.txt Text_example.txt
+  265  echo "# This file is created by Gonzalo Romero on: $(date)" > timestamp_header.txt
+  266  cat timestamp_header.txt
+  267  cd
+  268  c
+  269  cd Data/us_dot/otp/
+  270  ls
+  271  ls -l
+  272  ls -s
+  273  ls -S
+  274  ls -Ss
+  275  ls -Ss | head -3
+  276  ls -Ss | head -4
+  277  ls -Ss | head -4 >> three_largest_file.txt
+  278  cat thre
+  279  cat three_largest_file
+  280  cat three_largest_file.txt
+  281  history
+  282  history -20
+  283  history -20 >> history_20.txt
+  284  ls
+  285  cat history_20
+  286  cat history_20.txt
+  287  cd
+  288  cd Data/shell
+  289  cat Text_example.txt | head -3
+  290  cd
+  291  cd Data/opentraveldata/
+  292  cat -n optd_aircraft.csv
+  293  cd
+  294  cd Data/shell
+  295  cd
+  296  cd Data
+  297  cd us_dot/otp
+  298  ls -Ss
+  299  ls -lSl
+  300  -lsS
+  301  ls -lsS
+  302  ls -lsS1
+  303  ls
+  304  ls -1
+  305  cd
+  306  cd Data/shell
+  307  cat -n Text_example.txt
+  308  cat -n Text_example.txt | head -n
+  309  cat -n Text_example.txt | head -n -3
+  310  cat -n Text_example.txt | head -3
+  311  wc Finn.txt
+  312  wc -w  Finn.txt
+  313  cd
+  314  find -mmin 60
+  315  find -type f -mindepth 2 .mmin -60
+  316  find -type f -mindepth 2 -mmin -60
+  317  find -mmin -60 -mindepth 2 -type f
+  318  find -mindepth 2 -type f -mmin 60
+  319  cd Data
+  320  finde -type d -exec echo {} \nfind -type d -exec echo {} \nfind -type d -exec echo {} \;
+  321  find -type d -ok echo {} \;
+  322  find -type d -ok echo {} \; -exec sh -c
+  323  sh a
+  324  sh Shell
+  325  man sh
+  326  sudo gedit /usr/share/gnome-shell/theme/ubuntu.css
+  327  c
+  328  man uniq
+  329  seq 1 2 10 > uniq_example.txt
+  330  ls
+  331  cat uniq_example.txt
+  332  seq 1 10 >> uniq_example.txt
+  333  cat uniq_example.txt
+  334  cat uniq_example.txt | uniq
+  335  sort uniq_example.txt | uniq
+  336  sort uniq_example.txt | uniq -d
+  337  sort uniq_example.txt | uniq -c
+  338  sort -n uniq_example.txt
+  339  sort -nr uniq_example.txt
+  340  sort -rn uniq_example.txt
+  341  sort -n uniq_example.txt uniq_example.txt
+  342  sort -nu uniq_example.txt
+  343  cd Data/opentraveldata
+  344  sort -t "^" -k 6r optd_aircraft.csv
+  345  sort -t "^" -k 6r optd_aircraft.csv | head
+  346  sort -t "^" -k 6r,6 optd_aircraft.csv | head
+  347  sort -t "^" -k 2,2 -u optd_aircraft.csv | head
+  348  sort -t "^" -k 2,2 -u optd_aircraft.csv | wc
+  349  sort -t "^" -k 2,2 -u optd_aircraft.csv
+  350  sort -t "^" -k 2 -u optd_aircraft.csv
+  351  sort -t "^" -k 2 -u optd_aircraft.csv | wc
+  352  c
+  353  cd
+  354  find -type f -size +10M -exec ls -ls -sh {} \; | sort -nr | head
+  355  ls -sh
+  356  ls
+  357  ls -s
+  358  cd Data/opentraveldata
+  359  cut -d "^" -f 1-3,5 optd_aircraft.csv| head
+  360  cut -d "^" -f 1-3,5 --output-delimiter "," optd_aircraft.csv| head
+  361  cut -d "^" -f 1-3,5 --output-delimiter "OMG" optd_aircraft.csv| head
+  362  cut -d "^" -f 1-3,5 --output-delimiter "OMG" optd_aircraft.csv | cut -d "OMG" -f 2 | head
+  363  cut -d "^" -f 1-3,5 --output-delimiter "'OMG'" optd_aircraft.csv | cut -d "'OMG'" -f 2 | head
+  364  cut -d "^" -f 1-3,5 --output-delimiter "," optd_aircraft.csv | cut -d "," -f 2 | head
+  365  seq 10 | paste
+  366  seq 10 | paste -s
+  367  seq 10 | paste -s -d "^"
+  368  seq 10 | paste -s -d " A B C"
+  369  seq 10 | paste - - -
+  370  seq 10 | paste - - - -d" A B C"
+  371  pacd
+  372  cd
+  373  c
+  374  cd Data/shell
+  375  paste Text_example.txt Text_example.txt
+  376  seq 1 10 > numbers ; paste numbers
+  377  seq 1 10 > numbers ; paste numbers Text_example.txt
+  378  paste < numbers Text_example.txt
+  379  paste < numbers < Text_example.txt
+  380  paste < (cat numbers)
+  381  paste < (seq 10)
+  382  paste <(seq 10)
+  383  paste <(cat numbers)
+  384  paste <(seq 10) <Text_example.txt
+  385  paste <(seq 10) <(cat Text_example.txt)
+  386  c
+  387  echo "master data science"
+  388  echo "master data science" | tr a A
+  389  echo "master data science" | tr sa AB
+  390  echo "master      data        science" | tr -s " " "^"
+  391  echo "master      data        science" | tr  " " "^"
+  392  echo "mmaster daaaaata science" | tr -s "ma" "ma "
+  393  echo "mmaster daaaaata science" | tr -s "ma " "ma "
+  394  echo "mmaster daaaaata science" | tr -s
+  395  echo "mmaster daaaaata science" | tr -s "ma" "ma"
+  396  echo "master data science" | tr -d sa
+  397  echo "master data science" | tr -d aeiou
+  398  echo "master data science" | tr -cd aeiou
+  399  echo "mmmaster     daaaaata    science" | tr -s
+  400  echo "mmmaster     daaaaata    science" | tr -s m a
+  401  echo "mmmaster     daaaaata    science" | tr -s "[:blank:]" 1 tr
+  402  echo "mmmaster     daaaaata    science" | tr -s "[:blank:]" | tr -s "[:alnum:]"
+  403  echo "master 123 data 124 science 1" | tr -cd "[:digit:]"
+  404  man tr
+  405  echo "master 123 data 124 science 1" | tr -cd "[:alpha:]"
+  406  echo "master 123 data 124 science 1" | tr -d "[:alpha:]"
+  407  echo "master 123 data 124 science 1" | tr -d "[:lower:]" "[:upper:]"
+  408  echo "master 123 data 124 science 1" | tr "[:lower:]" "[:upper:]"
+  409  ------------
+  410  echo "master 123 data 124 science 1" | tr -d "[:digit:]" | tr -s " " "\n"
+  411  cd ..
+  412  cd opentraveldata
+  413  c
+  414  cat optd_aircraft.csv | tr "^" "," >> optd_aircraft_coma.csv
+  415  cat optd_aircraft_coma.csv
+  416  cat optd_por_public.csv
+  417  cat optd_por_public.csv | paste -d " "
+  418  cat optd_por_public.csv | wc
+  419  cat optd_por_public.csv | paste -d " " | wc
+  420  cat optd_por_public.csv | paste -d " " " " | wc
+  421  ls
+  422  cat optd_por_public.csv | paste -d " " " " |
+  423  cat optd_por_public.csv | tr -s " " | wc
+  424  cat optd_por_public.csv | tr -d "  " | wc
+  425  cat optd_por_public.csv | wc
+  426  cat optd_por_public.csv| head -1 | wc
+  427  cat optd_por_public.csv| head -1
+  428  cat optd_por_public.csv| head -1 | tr "^" " " | wc
+  429  cat optd_por_public.csv| head -1 | tr "^" "\n" | wc
+  430  cat optd_por_public.csv| head -1 | tr "^" "\n" | ls -n
+  431  cat optd_por_public.csv| head -1 | tr "^" "\n" > aux ; cat -n aux  
+  432  cat optd_airlines.csv | head -2
+  433  cat optd_airlines.csv | head -5
+  434  cat optd_airlines.csv| head -1 | tr "^" "\n" > aux ; cat -n aux  
+  435  cat optd_airlines.csv | sort -d -k 8 | uniq -c
+  436  cat optd_airlines.csv | sort -d -k 8,8 | uniq -c
+  437  cat optd_airlines.csv | sort -d -k 8,8 | uniq -c | head -5
+  438  cat optd_airlines.csv| head -1 | tr "^" "\n" > aux ; cat -n aux  
+  439  cat -n optd_airlines.csv| head -1 | tr "^" "\n" > aux
+  440  cat optd_airlines.csv | sort -d -t "^" -k 8,8 | uniq -c | head -5
+  441  cat optd_airlines.csv | sort -d -t "^" -k 14,14 | head -5
+  442  cat optd_airlines.csv | sort -dr -t "^" -k 14,14 | head -5
+  443  cd ..
+  444  cd shell
+  445  ls
+  446  cat Text_example.txt
+  447  grep this Text_example.txt
+  448  grep -i this Text_example.txt
+  449  grep -v this Text_example.txt
+  450  grep -in this Text_example.txt
+  451  grep -n this Text_example.txt
+  452  grep -c this Text_example.txt
+  453  grep -cv this Text_example.txt
+  454  grep -cv line Text_example.txt
+  455  grep -n line Text_example.txt
+  456  grep -nw line Text_example.txt
+  457  grep -nA 1 line Text_example.txt
+  458  grep -nB 1 line Text_example.txt
+  459  grep -nC 1 line Text_example.txt
+  460  grep -ni -E "^T"
+  461  grep -ni -E "^T" Text_example.txt
+  462  grep -nio -E "" Text_example.txt
+  463  grep -nio -E "^T" Text_example.txt
+  464  grep -niob -E "^T" Text_example.txt
+  465  seq 5 5 20 | grep "[1-5]{2}"
+  466  seq 5 5 30 | grep -E "[1-5]{2}"
+  467  seq 5 5 30 | grep -w -E "[1-5]{2}"
+  468  seq 5 5 120 | grep -w -E "[1-5]{2}"
+  469  seq 5 5 120 | grep -E "[1-5]{2}"
+  470  cd ../opentraveldata
+  471  cat optd_aircraft.csv | head -1
+  472  cat optd_aircraft.csv | head -1 | tr "^" "\n"
+  473  cat optd_aircraft.csv | head -1 | tr "^" "\n" | cat -n
+  474  cut -d "^" -f 3 optd_aircraft.csv
+  475  cut -d "^" -f 3 optd_aircraft.csv | grep -E "7[0-9]7"
+  476  cut -d "^" -f 3 optd_aircraft.csv | grep -E "7[digit]7"
+  477  cut -d "^" -f 3 optd_aircraft.csv | grep -E "7[0-9]7"
+  478  cut -d "^" -f 3 optd_aircraft.csv | grep -E "a[300-400"
+  479  cut -d "^" -f 3 optd_aircraft.csv | grep -E "a[300-400]"
+  480  cut -d "^" -f 3 optd_aircraft.csv | grep -iE "a[300-400]"
+  481  cut -d "^" -f 3 optd_aircraft.csv | grep -E "3[0-9][0-9]"
+  482  cat optd_aircraft.csv | head -1 | tr "^" "\n" | cat -n
+  483  cat optd_airlines.csv | head -1 | tr "^" "\n" | cat -n
+  484  cut -d "^" -f 3 optd_airlines.csv | grep -iE [^aero]
+  485  cut -d "^" -f 3 optd_airlines.csv | grep -iE "^aero"
+  486  cut -d "^" -f 3 optd_airlines.csv | grep -iE ^aero
+  487  cut -d "^" -f 3 optd_airlines.csv | grep -iE "^aero"2
+  488  cut -d "^" -f 8 optd_airlines.csv | grep -iE [^aero]
+  489  cut -d "^" -f 8 optd_airlines.csv | grep -iE "^aero"
+  490  cut -d "^" -f 8 optd_airlines.csv | grep -iE "^aero" | wc
+  491  echo Sunday
+  492  echo Sunday | sed sdaysnights
+  493  echo Sunday | sed ssdaysnights
+  494  echo Sunday | sed 's/day/night/'
+  495  echo day.day | sed 's.day.night'
+  496  echo day.day | sed 's.day.night.'
+  497  echo day.day | sed 's.day.night.g'
+  498  cd ..
+  499  cd shell
+  500  sed 's/this/THAT/gI' Text_example.txt
+  501  cat Text_example.txt
+  502  sed 's/this/THAT/gI' Text_example.txt > kk.txt
+  503  cat kk.txt
+  504  cp Text_example.txt Text_4sed.txt
+  505  sed -i 's/this/THAT/g' Text_4sed.txt
+  506  cat Text_4sed.txt
+  507  diff Text_4sed.txt Text_example.txt
+  508  seq 3 | '2p'
+  509  seq 3 | sed '2p'
+  510  seq 5 | sed '2p;4p'
+  511  seq 5 | sed '2,4p'
+  512  seq 5 | sed '2,4!p'
+  513  seq 5 | sed '2,4d'
+  514  mad sed
+  515  man sed
+  516  seq 10 15
+  517  seq 10 15 | sed '/13/d'
+  518  sed -i '3!d' Text_4sed.txt
+  519  cat Text_4sed.txt
+  520  sed -i s/line/\n/g
+  521  sed s/line/\n/g Text_example.txt
+  522  sed s/line/"\n"/gI Text_example.txt
+  523  cat Text_example.txt
+  524  sed s/line/\n/g Text_example.txt
+  525  sed s/line/\n/gI Text_example.txt
+  526  sed 's/line/\n/gI' Text_example.txt
+  527  sed '/line/d' Text_example.txt
+  528  sed '/line/dI' Text_example.txt
+  529  sed '/line/Id' Text_example.txt
+  530  sed '/line/!p' Text_example.txt
+  531  sed '/line/I!p' Text_example.txt
+  532  c
+  533  zip text_files Finn.txt Text_example.txt
+  534  ls
+  535  unzip -l text_files.zip
+  536  zipinfo text_files.zip
+  537  zcat text_files.zip | less
+  538  zless text_files.zip
+  539  zgrep -n [line] text_files.zip
+  540  zgrep -n "line" text_files.zip
+  541  unzip -p text_files.zip| less
+  542  unzip -c text_files.zip| less
+  543  cd ..
+  544  cd challenge
+  545  ls
+  546  ls -l
+  547  bzcat bookings.csv.bz2| head -5
+  548  bzcat bookings.csv.bz2| head
+  549  bzcat bookings.csv.bz2| tail
+  550  cd ..
+  551  cd op
+  552  cd opentraveldata
+  553  tar -czvf opentravel.gz.tar *.csv
+  554  ll
+  555  cd ..
+  556  cd us_dot
+  557  cd ot
+  558  cd otp
+  559  ls
+  560  zcat On_Time_On_Time_Performance_2015_1.zip
+  561  zless On_Time_On_Time_Performance_2015_1.zip
+  562  zcat On_Time_On_Time_Performance_2015_1.zip | head -1
+  563  cd ..
+  564  cd shell
+  565  vim
+  566  vim column_name_number.sh
+  567  column_name_number.sh
+  568  ./column_name_number.sh
+  569  chmod 777 column_name_number.sh 
+  570  ./column_name_number.sh
+  571  cd ..
+  572  cd opentraveldata
+  573  ./column_name_number.sh optd_aircraft_coma.csv
+  574  ./column_name_number.sh optd_aircraft_coma.csv ,
+  575  cd ..
+  576  cd shell
+  577  ./column_name_number.sh ../opentraveldata/optd_aircraft.csv "^"
+  578  vin column_name_number.sh
+  579  vim column_name_number.sh
+  580  ./column_name_number.sh ../opentraveldata/optd_aircraft.csv "^"
+  581  vim column_name_number.sh
+  582  ./column_name_number.sh ../opentraveldata/optd_aircraft.csv "^"
+  583  c
+  584  cd Data/opentraveldata
+  585  which csv look
+  586  which csvlook
+  587  sudo apt-get install python-dev python-pip python-setuptools build-essential\n
+  588  pip install csvkit\n
+  589  which csvlook
+  590  c
+  591  which csvlook
+  592  csvlook optd_aircraft.csv | less
+  593  csvlook --help
+  594  csvlook -d "^" optd_aircraft.csv | less
+  595  csvlook -ld "^" optd_aircraft.csv | less
+  596  csvlook -sd "^" optd_aircraft.csv | less
+  597  csvlook -ld "^" optd_aircraft.csv | less -L
+  598  csvlook -ld "^" optd_aircraft.csv | less -s
+  599  csvlook -ld "^" optd_aircraft.csv | less -S
+  600  csvlook -d "^" -c 2-4,7 optd_aircraft.csv | less
+  601  csvstat -d "^" -c 2-4,7 optd_aircraft.csv | less
+  602  csvstat -d "^" -c optd_aircraft.csv | less
+  603  csvstat -d "^" optd_aircraft.csv | less
+  604  csvstat -d "^" -c 2-4,7 optd_aircraft.csv | less
+  605  csvstat -d "^" -c manufacturer optd_aircraft.csv | less
+  606  csvcut -n optd_aircraft.csv
+  607  csvcut -d "^" -n optd_aircraft.csv
+  608  csvcut -d "^" -c 2 optd_aircraft.csv | head
+  609  csvcut -d "^" -c 2 optd_aircraft.csv | head -5
+  610  csvcut -d "^" -c manufacturer, model optd_aircraft.csv | head -5
+  611  csvcut -d "^" -c manufacturer,model optd_aircraft.csv | head -5
+  612  csvcut -d "^" -c manufacturer,model optd_aircraft.csv | head -5 | csvlook
+  613  csvcut -d "^" -c manufacturer,model optd_aircraft.csv | head | csvlook
+  614  grep 380 optd_aircraft.csv
+  615  grep "^380" optd_aircraft.csv
+  616  csvgrep -d "^" -m 380 optd_aircraft.csv
+  617  csvgrep -d "^" -m 380,2 optd_aircraft.csv
+  618  csvgrep -d "^" -c 3 -m 380 optd_aircraft.csv
+  619  csvgrep -d "^" -c 3 -m 380 optd_aircraft.csv | csvlook
+  620  csvgrep -d "^" -c 2 -m Fokker optd_aircraft.csv | csvlook
+  621  csvgrep -d "^" -c 2 -m Fokker optd_aircraft.csv | csvlook | ls -S
+  622  csvgrep -d "^" -c 2 -m Fokker optd_aircraft.csv > fokker.csv
+  623  head fokker.csv
+  624  csvgrep -d "^" -c 2 -im Fokker optd_aircraft.csv > Nofokker.csv
+  625  head fokker.csv
+  626  head Nofokker.csv
+  627  csvgrep -d " -c 1,2 -r "A"
+  628  csvgrep -d "^" -c 1,2 -r "A"
+  629  csvgrep -d "^" -c 1,2 -r "A" optd_aircraft.csv
+  630  csvgrep -d "^" -c 1,2 -r "A" optd_aircraft.csv | csvlook
+  631  csvgrep -d "^" -c 1,2 -r "^A" optd_aircraft.csv | csvlook
+  632  csvgrep -d "^" -a -c 1,2 -r "^A" optd_aircraft.csv | csvlook
+  633  less optd_aircraft.csv | csvlook
+  634  less optd_aircraft.csv | csvlook -d "^"
+  635  sort -t "^" -k 7rn,7 optd_aircraft.csv
+  636  sort -t "^" -k 7rn,7 optd_aircraft.csv | head
+  637  csvsort -d "^" -n optd_aircraft.csv
+  638  csvsort -d "^" -cr nb_engines optd_aircraft.csv | head -3
+  639  csvsort -d "^" -c nb_engines -r optd_aircraft.csv | head -3
+  640  csvsort -d "^" -c nb_engines -r optd_aircraft.csv | head | csvlook
+  641  csvsort -d "^" -c 7 -r optd_aircraft.csv | head | csvlook
+  642  csvsort -d "^" -c 7 -r optd_aircraft.csv | csvcut -c manufacturer,model | head
+  643  csvsort -d "^" -c 7 -r optd_aircraft.csv | csvcut -c manufacturer,model | head | csvlook
+  644  csvformat -d "^" -D "," optd_aircraft.csv > aircraft_comma.csv
+  645  csvlook aircraft_comma.csv| head
+  646  head optd_aircraft.csv > optd_aircraft_10.csv
+  647  cat optd_aircraft_10.csv
+  648  csvstack optd_aircraft_10.csv optd_aircraft.csv | csvlook
+  649  csvstack optd_aircraft_10.csv optd_aircraft.csv | csvlook -d "^"
+  650  csvsql -d "^" optd_aircraft.csv > sql_aircraft.sql
+  651  which csvsql
+  652  which csvlook
+  653  sudo apt install postgresql postgresql-contrib
+  654  csvsql -d "^" optd_aircraft.csv > sql_aircraft.sql
+  655  c
+  656  update conda
+  657  sudo apt-update conda
+  658  sudo update conda
+  659  sudo apt-get conda
+  660  sudo apt-get install conda
+  661  csvsql -d "^" optd_aircraft.csv > sql_aircraft.sql
+  662  cd /home/gonzalo
+  663  cd
+  664  c
+  665  which psql
+  666  psql -kl
+  667  psql -l
+  668  psql
+  669  c
+  670  psql -l
+  671  createdb dsc
+  672  psql -l
+  673  ^[[200~sudo -u postgres -i
+  674  sudo -u postgres -i
+  675  psql -l
+  676  sudo -u postgres -i
+  677  sudo -u postgres createuser gonzalo
+  678  psql
+  679  sudo -u postgres -i
+  680  sudo -u postgres createuser owning_user
+  681  sudo -u postgres createdb -O owning_user dbname
+  682  psql -l
+  683  psql
+  684  psql -l
+  685  createdb gonzalo
+  686  sudo createdb gonzalo
+  687  sudo -u postgres -i
+  688  psql -l
+  689  psql
+  690  cd Data/shell
+  691  wget https://raw.githubusercontent.com/masterdatascience/postgres/master/my_fb_friends.csv
+  692  https://raw.githubusercontent.com/masterdatascience/postgres/master/my_ldin_contacts.csv
+  693  wget https://raw.githubusercontent.com/masterdatascience/postgres/master/my_ldin_contacts.csv
+  694  psql
+  695  echo "DROP table if exists linkedin;">psql_create_contactos_sql
+  696  mv my_ldin_contacts.csv linkedin
+  697  cd
+  698  csvsql Data/shell/linkedin
+  699  cd
+  700  cd anaconda
+  701  cd anaconda3
+  702  csvsql Data/shell/linkedin
+  703  cd lib/python3.7/site-packages/mpl_toolkits
+  704  touch init.py
+  705  ls
+  706  wget https://pypi.python.org/packages/ec/ed/46b835da53b7ed05bd4c6cae293f13ec26e877d2e490a53a709915a9dcb7/matplotlib-2.2.2.tar.gz
+  707  tar -x -O - -f matplotlib-2.2.2.tar.gz matplotlib-2.2.2/lib/mpl_toolkits/__init__.py > /usr/local/lib/python3.6/site-packages/mpl_toolkits/__init__.py
+  708  ls
+  709  cd
+  710  csvsql Data/shell/linkedin
+  711  cd MASTER/SEMANA-2_Shell_SQL
+  712  ls
+  713  adobe Master_class_04v10.pdf
+  714  open Master_class_04v10.pdf
+  715  c
+  716  cd
+  717  cd Data/shell
+  718  echo "drop table if exists linkedin"
+  719  echo "drop table if exists linkedin">psql_create_contactos.sq
+  720  ls
+  721  rm psql_create_contactos.sq
+  722  ls
+  723    csvsql -d '^ linkedin -i postgresql >> psql_create_contactos.sql
+  724    csvsql -d '^' linkedin -i postgresql >> psql_create_contactos.sql
+  725  ls
+  726  rm psql_create_contactos.sql
+  727  rm psql_create_contactos_sql
+  728  echo "drop table if exists linkedin">psql_create_contactos.sql
+  729    csvsql -d '^' linkedin -i postgresql >> psql_create_contactos.sql
+  730  echo "\\\copy linkedin from './linkedin' delimiter '^'csv header; ">> psql_create_contactos.sql
+  731  cat ./psql_create_contactos.sql
+  732  psql -d networking -f psql_create_contactos.sql
+  733  psql -d gonzalo -f psql_create_contactos.sql
+  734  c
+  735  echo "drop table if exists linkedin">psql_create_contactos.sql
+  736  mv my_fb_friends.csv linkedin
+  737  csvsql -d '^' linkedin -i postgresql >> psql_create_contactos.sql
+  738  echo "\\\copy linkedin from './Data/shell/linkedin' delimiter '^' csv header;" >> psql_create_contactos.sql
+  739  cat psql_create_contactos.sql
+  740  psql -d gonzalo -f psql_create_contactos.sql
+  741  psql -l
+  742  cd .
+  743  rm psql_create_contactos.sql
+  744  echo "drop table if exists linkedin">psql_create_contactos.sql
+  745  mv my_fb_friends.csv linkedin
+  746  ls
+  747    csvsql -d '^' linkedin -i postgresql >> psql_create_contactos.sql
+  748  echo "\\\copy linkedin from './linkedin' delimiter '^' csv header;" >> psql_create_contactos.sql
+  749  cat psql_create_contactos.sql
+  750  psql -d gonzalo -f psql_create_contactos.sql
+  751  psqd
+  752  psql
+  753  c
+  754  cd ..
+  755  cd Data/opentraveldata
+  756  csvsql optd_aircraft.csv ./SQL/optd_aircraft.sql
+  757  mkdir SQL
+  758  ls
+  759  echo "drop table if exists optd_aircraft">./aircraft.sql
+  760  ls
+  761  cd SQL
+  762  ls
+  763  cs ..
+  764  cd ..
+  765  c
+  766  mv optd_aircraft.csv ./SQL/aircraft
+  767  cd SQL
+  768  ls
+  769  csvcat aircraft | head
+  770  csvlook aircraft | head
+  771  csvlook -d '^' aircraft | head
+  772  csvsql -d '^' aircraft -i postgresql >> aircraft.sql
+  773  echo "\\\copy aircraft from './aircraft' delimiter '^' cdv header;" >> aircraft.sql
+  774  cat aircraft.sql
+  775  vim aircraft.sql
+  776  cat aircraft.sql
+  777  vim aircraft.sql
+  778  cat aircraft.sql
+  779  vim aircraft.sql
+  780  cat aircraft.sql
+  781  psql -d gonzalo -f aircraft.sql
+  782  psql
+  783  c
+  784  psql
+  785  c
+  786  cd
+  787  c
+  788  psqd
+  789  psgd
+  790  psql
+  791  find -type f -maxdepth 2 -exec ls -s {}º; | head -10
+  792  find -type f -maxdepth 2 -exec ls -s {}; | head -10
+  793  find -type f -maxdepth 2 -exec ls -s {}\;
+  794  find -maxdepth -2 -type f -exec ls -s {}\;
+  795  find -maxdepth 2 -type f -exec ls -s {}\;
+  796  find -maxdepth 2 -type f -exec sh -c ls -s {}\;
+  797  find -maxdepth 2 -type f -exec -c ls -s -sh {}\;
+  798  find -maxdepth 2 -type f -exec ls -s -sh {}\;
+  799  find -maxdepth 2 -type f -exec ls -sh {}\;
+  800  find ./ -maxdepth 2 -type f -exec ls -sh {}\;
+  801  find 4 -maxdepth 2 -type f -exec ls -sh {}\;
+  802  find ~ -maxdepth 2 -type f -exec ls -sh {}\;
+  803  find ~ -maxdepth 2 -type f -exec ls {}\;
+  804  find ~ -maxdepth 2 -type f -exec sh {}\;
+  805  find ~ -maxdepth 2 -type f -exec ls sh {}\;
+  806  find ~ -maxdepth 2 -type f -exec ls sh -c {}\;
+  807  find ~ -maxdepth 2 -type f -exec ls {}\;
+  808  find ~ -maxdepth 2 -type f -exec ls -s {}\;
+  809  find ~ -type f -size +10M -exec ls -sh {} \; | sort -nr | head
+  810  find ~ -maxdepth 2 -type f -exec ls -sh {}\;
+  811  find ~ -maxdepth 2 -type f -exec ls -sh {} \;
+  812  find ~ -maxdepth 2 -type f -exec ls -s -sh {} \;
+  813  find ~ -maxdepth 2 -type f -exec ls -s -sh {} \; | sort -nr | head
+  814  cd Data/shell
+  815  seq 15 > 20lines.txt; seq 9 1 20 >> 20lines.txt; echo "20\n20" >> 20lines.txt;
+  816  cat 20lines.txt
+  817  sort -d 20lines.txt
+  818  sort -n 20lines.txt
+  819  sort -nu 20lines.txt
+  820  sort -n 20lines.txt | uniq -d
+  821  sort -n 20lines.txt | uniq -c
+  822  sort -n 20lines.txt | uniq -c | sort -n
+  823  sort -n 20lines.txt | uniq -c | sort -nr | head -1
+  824  seq 0 2 40 > 20lines2.txt
+  825  cat 20lines.txt ; cat 20lines2.txt
+  826  cat 20lines.txt | cat 20lines2.txt
+  827  cat 20lines.txt ; cat 20lines2.txt | sort -u 
+  828  sort -nu 20lines.txt 20lines2.txt > 20files_no_dupl.txt
+  829  cat 20files_no_dupl.txt
+  830  sort -nu 20lines2.txt 20lines.txt | uniq -c
+  831  sort 20lines2.txt 20lines.txt | uniq -c
+  832  sort 20lines2.txt 20lines.txt | uniq -c | sort -k 2n,2
+  833  sort 20lines2.txt 20lines.txt | uniq -c | sort -k 1n,2
+  834  cd ..
+  835  cd opentraveldata
+  836  sort optd_aircraft.csv
+  837  sort -k 7 optd_aircraft.csv 
