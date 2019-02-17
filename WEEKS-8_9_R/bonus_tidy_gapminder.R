@@ -10,8 +10,8 @@ library(tidyr)
 
 gapminder <- read_csv("data/gapminder.csv")
 
-gap_wide <- read_csv("https://docs.google.com/spreadsheets/d/1NTXQNoY8V0H_EZ_peFmnH1ZcGlxCPhwl2VmJNpiACMU/pub?output=csv")
-# gap_wide <- read.csv('data/gapminder_wide.csv')
+#gap_wide <- read_csv("https://docs.google.com/spreadsheets/d/1NTXQNoY8V0H_EZ_peFmnH1ZcGlxCPhwl2VmJNpiACMU/pub?output=csv")
+gap_wide <- read.csv("data/gapminder_wide.csv")
 head(gap_wide)
 
 gap_long <- gap_wide %>% 

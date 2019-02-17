@@ -8,7 +8,7 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages)
 
 
-flights <- readr::read_csv('data/flights/2008.csv')
+flights <- readr::read_csv("downloads/2008.csv")
 
 
 
@@ -423,6 +423,7 @@ foo <- flights %>%
   mutate(CancellationCode = recode(CancellationCode, "A"="Carrier", "B"="Weather", "C"="National Air System", 
                                    .missing="Not available", 
                                    .default="Others" ))
+unique(foo$CancellationCode)
 rm(foo)
 
 
@@ -490,10 +491,10 @@ flights %>%
 # anti_join(x, y)
 
 
-airlines <- readr::read_csv('data/airlines.csv')
+airlines <- readr::read_csv("data/airlines.csv")
 airlines
 
-airports <- readr::read_csv('data/airports.csv')
+airports <- readr::read_csv("data/airports.csv")
 airports
 
 # Before joing dataframes, check for unique keys
@@ -516,9 +517,8 @@ flights2 %>%
 # Exercises:
 # Join flights2 with airports dataset
 
-
-
-
+flights2 %>% 
+  left_join(airports, by = c("Dest" = "iata"))
 
 
 # Dates with lubridate ----------------------------------------------------

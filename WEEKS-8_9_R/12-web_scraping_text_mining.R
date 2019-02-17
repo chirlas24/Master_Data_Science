@@ -112,16 +112,15 @@ url <- "https://www.amazon.es/Cincuenta-Sombras-Grey-L-James/product-reviews/110
 
 # Vamos a filtrar las que no tengan iun numero de palabras minimo
 
+opiniones_amazon <- read_csv('data/opiniones_amazon_50_sombras.csv')
+
 opiniones_amazon <- opiniones_amazon %>%  
   mutate(n_words = stringr::str_count(opinion, ' ') ) %>% 
   filter(n_words > 50)
 
-# opiniones_amazon <- read_csv('data/opiniones_amazon_50_sombras.csv')
-
-
 # Calcular el sentimiento de cada opinión
 
-gl_auth('cpb100-162913-eb077c530ef4.json')
+gl_auth('cpb100-162913-faf075966c64.json')
 
 # sentimiento <- read_rds('data/sentimiento.rds')
 # head(sentimiento)

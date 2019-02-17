@@ -24,6 +24,8 @@ gapminder
 ?gapminder
 summary(gapminder)
 
+library(dplyr)
+?glimpse
 glimpse(gapminder)
 
 dim(gapminder)
@@ -41,10 +43,19 @@ ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log1
 
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() + geom_point(aes(color=continent)) + geom_smooth()
 
-ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() + geom_point(aes(color=continent)) + geom_smooth(lwd=1, se=FALSE, method="lm", col="black")
+ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() + geom_point(aes(color=continent)) + geom_smooth(lwd=1, se=FALSE, method="lm", col="black") + facet_grid(~ continent)
+
+gg <-  ggplot(gapminder, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() + geom_point(aes(color=continent)) + geom_smooth(lwd=1, se=FALSE, method="lm", col="black") + facet_wrap(~ continent, scales="free_y")
 
 ggplot(gapminder, aes(x = gdpPercap, y = lifeExp, color = continent))  + geom_point() + scale_x_log10()  + geom_smooth(se=F, lwd=1)
 
+
+#VAmos a transformarlo con plotly
+install.packages("plotly")
+library("plotly")
+
+p <- ggplotly(gg)
+p
 
 # Todo junto:
 p <- ggplot(gapminder, aes(gdpPercap, lifeExp))
@@ -54,7 +65,7 @@ p
 
 gappminder_plot <- ggplot(gapminder) +
   aes(x = gdpPercap, y = lifeExp, colour = continent,
-      size = pop, frame = year) +
+      size = pop) +
   geom_point(alpha = 0.4) +
   scale_x_log10()
 gappminder_plot
@@ -103,7 +114,7 @@ ggplot(gapminder, aes(x = year, y = lifeExp)) + geom_boxplot(aes(group = year))
 #' geom_violin()
 ggplot(gapminder, aes(x = year, y = lifeExp)) +
   geom_violin(aes(group = year)) +
-  geom_jitter(alpha = 1/4) +
+ geom_jitter(alpha = 1/4) +
   geom_smooth(se = FALSE)
 
 #' stripplots: para una variable cualitativa y una cuantitativa
@@ -120,7 +131,7 @@ ggplot(gapminder, aes(x = continent, y = lifeExp)) + geom_boxplot()
 
 #' raw data AND boxplots
 ggplot(gapminder, aes(x = continent, y = lifeExp)) +
-  geom_boxplot(outlier.colour = "hotpink") +
+  geom_boxplot(outlier.colour = "red") +
   geom_jitter(position = position_jitter(width = 0.1, height = 0), alpha = 1/4)
 
 #' superposición de información estadística
@@ -136,6 +147,8 @@ ggplot(gapminder, aes(reorder(x = continent, lifeExp), y = lifeExp)) +
 
 # themes ------------------------------------------------------------------
 
+## PAra eleguir un tema para todo el rato:
+#theme_set(theme_light())
 
 gappminder_plot + theme_grey()
 
@@ -191,8 +204,9 @@ ggsave("gapminder.png", width = 6, height = 4)
 
 # brew install imagemagick
 # Source: https://github.com/dgrtwo/gganimate
-# install.packages("cowplot")  # a gganimate dependency
-# devtools::install_github("dgrtwo/gganimate")
+install.packages("cowplot")  # a gganimate dependency
+library("devtools")
+devtools::install_github("dgrtwo/gganimate")
 
 library(gganimate)
 theme_set(theme_minimal())  # pre-set the bw theme.
@@ -236,6 +250,7 @@ gganimate(g2, interval=0.4, ani.width=800, ani.height=600)
 
 # ggpairs ------------------------------------------------------------------
 
+install.packages("GGally")
 library(GGally)
 gapminder %>% 
   filter(country %in% c("Spain", "Brazil", "Angola")) %>% 
@@ -245,6 +260,7 @@ gapminder %>%
 
 # googleVis ---------------------------------------------------------------
 
+install.packages("gogoleVis")
 library(googleVis)
 gg <- gvisMotionChart(gapminder, idvar='country', timevar='year', colorvar ='continent', xvar = 'gdpPercap', yvar = 'lifeExp', sizevar='pop')
 plot(gg) # Necesita Flash

@@ -61,6 +61,6 @@ airbnb_plot <- airbnb %>%
   mutate(price = log10(price)) %>% 
   qmplot(longitude, latitude, data = ., geom = "blank") +
   geom_point(aes(color = price), alpha = .2, size = .3) +
-  scale_color_continuous(low = "red", high = "blue")
+  scale_color_continuous(low = "green", high = "red")
 
 airbnb_plot
