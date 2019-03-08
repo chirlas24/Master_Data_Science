@@ -1,0 +1,966 @@
+---
+title: "Unsupervised Machine Learning"
+author: "FSC"
+date: "March 2, 2019"
+output:
+  pdf_document: 
+    toc: true
+    toc_depth: 5
+  html_document: 
+    toc: true
+    toc_depth: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/fscabo/Desktop/MasterDataScience_KSchool/Session_UnsupervisedClustering")
+```
+
+# Aprendizaje no supervisado vs apredizaje supervisado
+
+En data science solemos trabajar con un gran número de variables predictoras que potencialmente pueden tener una influencia en la variable que queremos predecir (outcome). Además, como ya habréis visto en las clases de aprendizaje supervisado es importante que los predictores no sean colineales por interpretabilidad del modelo y para mejorar su poder predictivo (RF,GLM,DL) o incluso para otros modelos como Naive Bayes se asume que las variables tienen que ser independientes entre si. 
+
+En algunas ocasiones ni siquiera tenemos muy claro cual es el mejor outcome a predecir para investigar un cierto problema. Por ejemplo, si queremos estimar la calidad de un producto podemos utilizar varias medidas para ello: el grado de satisfacción registrado por los consumidores medido por una encuesta, la evolución en las ventas durante un año, la evolución de las ventas de productos consumidores...
+
+Por ello, un primer análisis exploratorio de los datos es importante. Y esto incluye variables predictoras y posibles outcomes. Hablamos de aprendizaje no supervisado cuando NO TENEMOS ETIQUETAS, simplemente buscamos identificar patrones en nuestros datos, tanto para las variables como para los individuos, de manera insesgada. No intentamos clasificar o predecir un outcome, solo encontrar patrones, como podemos ver en la Figura 1. 
+
+El material de esta clase ha sido elaborado con los recursos proporcionados en el libro: https://leanpub.com/dataanalysisforthelifesciences/
+
+![Supervised vs Unsupervised learning](Images/SupervisedVSUnsupervised.jpg)
+
+
+# Distancia
+
+## Introducción
+
+Un concepto clave en clasificacion no-supervisada es la distancia, ya que en general se trata de encontrar grupos de objetos que están "cerca" unos de otros, _whatever that means_. Por ejemplo, construyendo el árbol de la vida de los pokemons estamos implícitamente calculando distancias entre sus características
+
+![Clustering Pokemons.](Images/pokemon.jpg)
+
+Para llegar a generar el árbol genealógico de los pokemons necesitamos crear una matriz en la que especifiquemos cómo de similares son unos de otros en función de varias características que hemos definido como: color, hábitat, categoría, tipo, aletas (SI/NO), cola (SI/NO), alas (SI/NO). 
+
+Los vectores de caracteristicas de cada pokemon quedarian asi: 
+
+```{r pokemon,warning=F}
+pokemons=c("blastoise","charizard","primarina","delphox","pikachu")
+blastoise=c("azul","laguna","marisco","agua","NO","SI","NO")
+charizard=c("naranja","pradera","llama","fuego","NO","SI","SI")
+primarina=c("azul","laguna","solista","agua","NO","SI","NO")
+delphox=c("naranja","pradera","zorro","fuego","NO","SI","NO")
+pikachu=c("amarillo","bosque","ratón","eléctrico","NO","SI","NO")
+# all.pokemon=tibble(type=rep(pokemons,each=7),
+#                        chars=c(blastoise,charizard,primarina,delphox,pikachu))
+all.pokemon=data.frame(blastoise,charizard,primarina,delphox,pikachu)
+rownames(all.pokemon)=c("color", "hábitat", "categoría", "tipo", "aletas", "cola", "alas")
+```
+
+Podemos generar un _heatmap_ que resuma la información de los pokemon 
+```{r pokemon2,warning=F}
+library(ComplexHeatmap) 
+Heatmap(all.pokemon)
+```
+
+La distancia entre ellos vendrá dada por el número de características distintas que tienen: 
+```{r pokemon3,warning=F}
+sim<-matrix(NA,5,5)
+for (i in 1:5){
+  for (j in 1:5){sim[i,j]<-length(setdiff(all.pokemon[,i],all.pokemon[,j]))}
+}
+colnames(sim)=pokemons
+rownames(sim)=pokemons
+```
+
+Y podemos pintar cómo se organizan en función de esa matriz de distancias: 
+
+```{r pokemon4,warning=F}
+library(cluster)
+divisive.clust <- diana(sim, 
+                  diss = TRUE, keep.diss = TRUE)
+plot(divisive.clust, main = "Divisive")
+```
+
+
+En un problema de clasificación supervisada las características de cada pokemon serían las _features_, _predictores_ o _variables independientes_ en terminología estadística tradicional, mientras que el tipo de pokemon sería la etiqueta _label_, _outcome_ o _variable dependiente_
+Aquí lo único que nos interesa es saber qué pokemons forman parte de las mismas subfamilias o, de manera más general, _grupos_ o _clústers_
+
+Vamos a revisar brevemente algunos de los conceptos básicos de distancia:
+
+## Euclidean Distance
+
+Si tenemos dos puntos $A$ and $B$ en un espacio cartesiano de 2 dimensiones:
+
+```{r,echo=FALSE,fig.cap=""}
+library(rafalib)
+mypar()
+plot(c(0,1,1),c(0,0,1),pch=16,cex=2,xaxt="n",yaxt="n",xlab="",ylab="",bty="n",xlim=c(-0.25,1.25),ylim=c(-0.25,1.25))
+lines(c(0,1,1,0),c(0,0,1,0))
+text(0,.2,expression(paste('(A'[x]*',A'[y]*')')),cex=1.5)
+text(1,1.2,expression(paste('(B'[x]*',B'[y]*')')),cex=1.5)
+text(-0.1,0,"A",cex=2)
+text(1.1,1,"B",cex=2)
+```
+
+La distancia euclídea entre ellos es:
+
+$$\sqrt{ (A_x-B_x)^2 + (A_y-B_y)^2}$$
+
+
+## Distancia en más dimensiones
+
+Vamos a utilizar un dataset con medidas de expresión génica para 22,215 genes en 189 muestras. Podemos bajarnos directamente el dataset:
+
+```{r,eval=FALSE,echo=F}
+library(devtools)
+install_github("genomicsclass/tissuesGeneExpression")
+```
+
+Cada muestra representa la expresión de todos esos genes en 18 tejidos distintos. Para cada tejido tenemos un número diferente de pacientes. 
+
+```{r}
+library(tissuesGeneExpression)
+data(tissuesGeneExpression)
+dim(e) ##e contains the expression data
+table(tissue) ##tissue[i] tells us what tissue is represented by e[,i]
+```
+
+Queremos descubrir qué muestras se parecen mas. Se parecerán más por individuo? O por tejido? También puede ser interesante encontrar genes con una expresión parecida a lo largo de los distintos tejidos o en ciertos tejidos en particular. 
+
+Ahora no estamos en un plano cartesiano como antes, porque cada punto puede ser:
+
+* una muestra: y por tanto tendría una dimension 22215, matemáticamente escrito 
+
+$(Y_{1,i},\dots,Y_{22215,i})^\top$
+
+* un gen: que tendría una dimensión 189, u 8 si estamos considerando sólo la media de la expresión en cada tejido, matemáticamente escrito: 
+
+$(Y_{g,1},\dots,Y_{g,189})^\top$
+
+
+Tenemos los puntos definidos. La distancia Euclídea entre dos muestras $i$ y $j$ si que se define como:
+
+$$
+\mbox{dist}(i,j) = \sqrt{ \sum_{g=1}^{22215} (Y_{g,i}-Y_{g,j })^2 }
+$$
+
+Y la distancia entre dos genes $h$ y $g$ será :
+
+$$
+\mbox{dist}(h,g) = \sqrt{ \sum_{i=1}^{189} (Y_{h,i}-Y_{g,i})^2 }
+$$
+
+
+## Distancia usando matrices
+
+La distancia entre dos muestras $i$ y $j$ se define como:
+
+$$ \mbox{dist}(i,j) = (\mathbf{Y}_i - \mathbf{Y}_j)^\top(\mathbf{Y}_i - \mathbf{Y}_j)$$
+
+donde $\mathbf{Y}_i$ y $\mathbf{Y}_j$ para las columnas $i$ y $j$.
+
+Álgebra de matrices es la forma más eficiente computacionalmente para ejecutar los métodos de clustering que veremos en estas clases. 
+
+## Examples
+
+Calculemos la distancia entre las muestras 1 y 2 (riñones) de la matriz de expresión y a la muestra 87 (colon).
+
+```{r}
+x <- e[,1]
+y <- e[,2]
+z <- e[,87]
+sqrt(sum((x-y)^2))
+sqrt(sum((x-z)^2))
+```
+
+Cómo cabría esperar los riñones están más cerca entre ellos que del colon. Utilizando álgebra de matrices:
+
+```{r}
+sqrt( crossprod(x-y) )
+sqrt( crossprod(x-z) )
+```
+
+Si queremos calcular todas las distancias a la vez usaremos la función `dist`. Esta función computa por defecto la distancia entre filas. Por lo tanto tenemos que transponer la matriz (darle la vuelta) para que calcule la distancia entre columnas.
+
+```{r}
+d <- dist(t(e))
+class(d)
+```
+
+El output es un objeto de tipo dist que necesitamos forzar en una matriz para acceder a sus filas y columnas:
+
+```{r}
+as.matrix(d)[1,2]
+as.matrix(d)[1,87]
+```
+Anticipando lo que viene después así quedaría el clustering jerárquico de la matriz de expresión génica (restringiendonos a los 100 primeros genes por problemas de memoria):
+
+```{r}
+library(ComplexHeatmap)
+Heatmap(t(scale(t(e[1:100,]))),show_row_names = F,show_column_names = F)
+```
+
+
+**IMPORTANTE: Si calculas dist(e) calculará la distancia dos a dos de las 22500 filas, lo cual puede romper tu sesión de R**
+
+# Técnicas de reducción de la dimensionalidad 
+
+## Motivación
+Como ya hemos visto anteriormente, la visualizacion de los datos es esencial en datascience. El problema es que no podemos ver nada en una dimensión superior a 3D, lo cual equivaldria a tres variables. Imaginemos un estudio de calidad de producto a 1000 individuos en el que tenemos medidas las respuestas a 100 preguntas de un cuestionario. Para comparar esta información dos a dos si no estamos seguros de que las relaciones entre los datos son lineales (en cuyo caso la correlación sería completamente meaningless) necesitaríamos crear 4950 scatterplots y explorarlos, lo cual es por completo imposible. Y crear un sólo plot es del todo imposible porque cada punto, que representa las respuestas a una pregunta, es 1000-dimensional (el número de individuos que han respondido). 
+
+Por ello necesitamos reducir la dimensionalidad de nuestros datos a tan sólo 2 o 3 dimensiones, que es aquello que la mente humana puede percibir, con la menor pérdida de información posible. Una de las cosas más importante a preservar es la distancia entre las variables. Singular Value Decomposition (SVD) es el método numérico matemático que utilizaremos en Principal Component Analysis, una de las formas más conocidas de reducción de la dimensionalidad. Esta técnica se basa sin embargo en relaciones lineales entre variables que en datasets de gran dimensionalidad y heterogeneidad puede no ser lo más apropiado. Para estos otros casos revisaremos una nueva técnica llamada t-sne.   
+
+Pero antes de eso, veamos un ejemplo
+
+### Ejemplo: 2D to 1D 
+
+Queremos explorar la altura de hermanos gemelos. Para cada pareja de gemelos simulamos la desviación con respecto a la media de la altura de cada gemelo. Es decir, si uno mide 172 cm y el otro 168, tendríamos dos medidas (2,-2) que indicarían la desviación en cm para cada una de las mediciones respecto a la media 170. 
+
+Este tipo de distribución se llama normal multivariante y en realidad son dos normales correlacionadas. La correlación entre ambas variables es de 0.95.
+
+```{r simulate_twin_heights, fig.cap="Simulated twin pair heights.",warning=F,echo=FALSE,message=FALSE}
+#install.packages("rafalib")
+library(rafalib)
+library(MASS)
+set.seed(1)
+n <- 100
+y=t(mvrnorm(n,c(0,0), matrix(c(1,0.95,0.95,1),2,2)))
+mypar()
+plot(y[1,], y[2,], xlab="Twin 1 (standardized height)", 
+     ylab="Twin 2 (standardized height)", xlim=c(-3,3), ylim=c(-3,3))
+points(y[1,1:2], y[2,1:2], col=2, pch=16)
+```
+
+El vector 1 representa la desviación respecto a la media del gemelo 1 y el vector 2, la desviación respecto a la media del gemelo 2. Hemos marcado en naranja la diferencia en altura para los dos gemelos de la pareja 1 y de la pareja 2 y estamos interesados en conocer la distancia entre estos dos puntos. Cómo la calculamos? Es muy fácil usando R.
+
+```{r}
+d=dist(t(y))
+as.matrix(d)[1,2]
+```
+
+Pero, que pasaría si dibujar en 2 dimensiones fuera muy complejo? Cómo podríamos sumarizar la información de las dos dimensiones en una sola, preservando la distancia entre los puntos? 
+
+Imaginemos que hay una línea que une dos puntos cualquiera del scatterplot. El tamaño de la línea es la distancia entre ambos puntos. Como esas líneas son todas pequeñas desviaciones de la diagonal podemos probar a rotar el gráfico de manera que la diagonal se convierta en el eje de las x. Así tendríamos un plot MA que representa la diferencia entre los valores (M) en el eje Y y la media de los valores en el eje x (A)
+
+
+```{r rotation, fig.cap="Twin height scatterplot (left) and MA-plot (right).",fig.width=10.5,fig.height=5.25}
+z1 = (y[1,]+y[2,])/2 #the sum 
+z2 = (y[1,]-y[2,])   #the difference
+z = rbind( z1, z2) #matrix now same dimensions as y
+thelim <- c(-3,3)
+mypar(1,2)
+plot(y[1,],y[2,],xlab="Twin 1 (standardized height)",
+     ylab="Twin 2 (standardized height)",
+     xlim=thelim,ylim=thelim)
+points(y[1,1:2],y[2,1:2],col=2,pch=16)
+plot(z[1,],z[2,],xlim=thelim,ylim=thelim,xlab="Average height",ylab="Difference in height")
+points(z[1,1:2],z[2,1:2],col=2,pch=16)
+```
+La nueva matriz z que también tiene dos dimensiones (difference & average) en realidad la hemos obtenido multiplicando la matriz y original por una matriz A fija de la forma:
+$$
+A = \,
+\begin{pmatrix}
+1/2&1/2\\
+1&-1\\
+\end{pmatrix}
+\implies
+z = A y
+$$
+
+Podemos volver a transformar los datos a su forma original multiplicando por $A^{-1}$:
+
+$$
+A^{-1} = \,
+\begin{pmatrix}
+1&1/2\\
+1&-1/2\\
+\end{pmatrix}
+\implies
+y = A^{-1} z
+$$
+
+
+### Rotaciones
+
+Habeis visto que hemos realizado una rotación de los datos. Esto en matemáticas se hace multiplicando matrices de unas ciertas características. Lo bueno es que se mantiene la distancia entre los puntos, que es lo que realmente nos interesa de este gráfico. Otra transformacion adicional de los datos que tampoco modifica la distancia entre puntos es un re-escalado. Esto se hace multiplicando por un escalar (valor único). La desviación estandard de las nuevas variables $M$ y $A$ son:  
+
+$$
+\mbox{sd}[ Z_1 ] = \mbox{sd}[ (Y_1 + Y_2) / 2 ] = \frac{1}{\sqrt{2}} \sigma \mbox{ and } \mbox{sd}[ Z_2] = \mbox{sd}[ Y_1 - Y_2  ] = {\sqrt{2}} \sigma 
+$$
+
+Por lo que si cambiamos la transformación anterior a:
+
+$$
+A = \frac{1}{\sqrt{2}}
+\begin{pmatrix}
+1&1\\
+1&-1\\
+\end{pmatrix}
+$$
+
+la desviación standard de cada columna de $Y$ es igual a la varianza de las columnas de $Z$. Como para $A$ se cumple que $A^{-1}A=I$ decimos que $A$ es una matriz _ortogonal_, lo que garantiza que las distancias se preserven:
+
+```{r rotation_preserves_dist, fig.cap="Distance computed from original data and after rotation is the same."}
+A <- 1/sqrt(2)*matrix(c(1,1,1,-1),2,2)
+z <- A%*%y
+d <- dist(t(y))
+d2 <- dist(t(z))
+mypar(1,1)
+plot(as.numeric(d),as.numeric(d2)) #as.numeric turns distances into long vector
+abline(0,1,col=2)
+```
+
+Esta transformación se llama _rotacion_ de `y`. 
+
+```{r rotation2, fig.cap="Twin height scatterplot (left) and after rotation (right).",fig.width=10.5,fig.height=5.25}
+mypar(1,2)
+thelim <- c(-3,3)
+plot(y[1,],y[2,],xlab="Twin 1 (standardized height)",
+     ylab="Twin 2 (standardized height)",
+     xlim=thelim,ylim=thelim)
+points(y[1,1:2],y[2,1:2],col=2,pch=16)
+plot(z[1,],z[2,],xlim=thelim,ylim=thelim,xlab="Average height",ylab="Difference in height")
+points(z[1,1:2],z[2,1:2],col=2,pch=16)
+```
+
+Si recordais hicimos esto para intentar tener una forma de ver los datos en una sola dimension preservando la caracteristica que mas nos interesa: la distancia entre los puntos. De manera intuitiva sugerimos esta transformacion porque vimos que mas o menos las lineas que unían dos puntos cualquiera eran pequeñas desviaciones de la identidad. Vamos a prescindir de la segunda dimensión de `z` que era $A$ y vamos a volver a computar las distancias:
+
+
+```{r approx_dist, fig.cap="Distance computed with just one dimension after rotation versus actual distance."}
+d3 = dist(z[1,]) ##distance computed using just first dimension
+mypar(1,1)
+plot(as.numeric(d),as.numeric(d3)) 
+abline(0,1)
+```
+
+La distancia calculada sólo sobre $M$ nos proporciona una muy buena aproximación habiendo reducido las dimensiones de 2 a 1. La primera dimensión del dato transformado es su primera _componente principal_. Así funciona el _análisis de componentes principales_ __(PCA)__ y su generalización _Singular Value Decomposition_ __(SVD)__ 
+
+## Principal Component Analysis 
+
+### Example: Twin heights
+
+Vamos a generar ahora un dataset de alturas distinto al anterior:
+
+```{r, message=FALSE}
+set.seed(1988)
+library(MASS)
+n <- 100
+x <- rbind(mvrnorm(n / 2, c(69, 69), matrix(c(9, 9 * 0.9, 9 * 0.92, 9 * 1), 2, 2)),
+           mvrnorm(n / 2, c(55, 55), matrix(c(9, 9 * 0.9, 9 * 0.92, 9 * 1), 2, 2)))
+```
+
+Hemos simulado una distribución normal bivariante, lo cual puede verse con un gráfico:
+
+```{r simulated-twin-heights, fig.width=4, fig.height=4, echo=FALSE, message=FALSE}
+lim <- c(48, 78)
+rafalib::mypar()
+plot(x, xlim=lim, ylim=lim)
+```
+
+Nuestras variables son otra vez vectores de dimension 2, con dos alturas. Vamos a ver si con sólo una dimension somos capaces de identificar las dos clases que tenemos: adultos y niños.
+
+
+```{r distance-illustration, fig.width=4, fig.height=4, echo=FALSE}
+rafalib::mypar()
+plot(x, xlim=lim, ylim=lim)
+lines(x[c(1, 2),], col = "blue", lwd = 2)
+lines(x[c(2, 51),], col = "red", lwd = 2)
+points(x[c(1, 2, 51),], pch = 16)
+d <- dist(x)
+as.matrix(d)[1, 2]
+as.matrix(d)[2, 51]
+```
+
+La linea roja nos marca la distancia entre los dos puntos azules. 
+Usando la transformación que ya conocemos:
+
+```{r}
+z  <- cbind((x[,2] + x[,1])/2,  x[,2] - x[,1])
+```
+
+Vemos que la media es suficiente para explicar los datos y que la distancia permanece igual:
+```{r rotation5, fig.width=4, fig.height=4, echo=FALSE}
+rafalib::mypar()
+plot(z, xlim=lim, ylim = lim - mean(lim))
+lines(z[c(1,2),], col = "blue", lwd = 2)
+lines(z[c(2,51),], col = "red", lwd = 2)
+points(z[c(1,2,51),], pch = 16)
+```
+
+
+Utilizando la misma transformación que en el primer ejemplo podemos sumarizar dos medidas en una. Si exploramosla primera dimensión de $Z$ vemos:
+
+```{r twins-pc-1-hist, message=FALSE, warning=FALSE}
+library(tidyverse)
+qplot(z[,1], bins = 20, color = I("black"))
+```
+
+Lo que nos muestra que hay dos tipos de medidas: de niños y de adultos. 
+La razon por la que todo salió tan bien fue que las variables de $X$ estaban muy correlacionadas:
+
+```{r}
+cor(x[,1], x[,2])
+```
+
+y la transformación produjo dos variables no correlacionadas:
+
+```{r}
+cor(z[,1], z[,2])
+```
+
+Esto es algo relativamente comun en problemas de machine learning. En estos casos PCA puede usarse como procedimiento de feature selection.
+
+
+`
+
+### Fundamentos
+
+La variabilidad total del dataset de la altura de gemelos sería la suma de la suma de cuadrados de cada columna. Si cada columna está centrada en 0 la suma de los cuadrados equivaldria a a suma de las varianzas de cada columna. 
+
+$$
+v_1 + v_2, \mbox{ with } v_1 = \frac{1}{N}\sum_{i=1}^N X_{i,1}^2 \mbox{ and } v_2 =  \frac{1}{N}\sum_{i=1}^N X_{i,2}^2 
+$$
+
+los calculamos con:
+```{r}
+colMeans(x^2) 
+```
+
+Es interesante ver que la variable $Z$ recoge el 99% de la variabilidad del dataset mientras que para x ambas variables tienen mas o menos la misma variabilidadof the variability is included in just the first dimensions:
+
+```{r}
+colMeans(z^2)
+v <- colMeans(z^2)
+v/sum(v)
+```
+
+La _primera componente principal_ de una matriz $X$ is la transformacion lineal ortogonal (su inversa es su traspuesta) que maximiza la variabilidad. La función `prcomp` produce exactamente esto:
+
+```{r}
+pca <- prcomp(x)
+pca$rotation
+```
+Es una matriz ortogonal (su traspuesta es igual a su inversa)
+```{r}
+library(matlib)
+t(pca$rotation)
+inv(pca$rotation)
+```
+
+Siempre podemos encontrar esa transformacion lineal, para cualquier numero de dimensiones.
+
+Para una matriz multidimensional $X$ con $p$ columnas podemos encontrar una transformación que crea $Z$ que mantiene la distancia entre filas pero para la que las nuevas columnas tienen una varianza decreciente. 
+
+
+### Interpretación de las componentes principales
+
+El vector ortogonal que maximiza la suma de cuadrados:
+
+$$(\mathbf{u}_1^\top\mathbf{Y})^\top(\mathbf{u}_1^\top\mathbf{Y})$$ 
+
+$\mathbf{u}_1^\top\mathbf{Y}$ es la _primera componente principal_. Los _weights_ $\mathbf{u}$ que se usan para obtenerla son los _loadings_. Si pensáramos en términos de rotaciones la primera componente sería la _direction_ , que son las nuevas coordenadas.
+
+Ahora repetiríamos el ejercicio de maximización para la suma de los cuadrados de los residuos:
+
+$$\mathbf{r} = \mathbf{Y} - \mathbf{u}_1^\top \mathbf{Yv}_1 $$
+
+La _segunda componente principal_ es un vector de la forma: 
+
+$$ \mathbf{v}_2^\top \mathbf{v}_2=1$$
+
+$$ \mathbf{v}_2^\top \mathbf{v}_1=0$$ 
+
+que maximiza  $(\mathbf{rv}_2)^\top \mathbf{rv}_2$.
+
+Si $Y$ es $N \times m$ podemos encontrar m componentes principales.
+
+Es muy interesante ver cómo esa primera componente sumariza los datos. Rojo representa valores positivos y azul negativos:
+
+```{r illustrate-pca-twin-heights, echo=FALSE, height = 5, out.width="100%"}
+illustrate_pca <- function(x, flip=1, 
+                           pad = round((nrow(x)/2-ncol(x))*1/4), 
+                           cex = 10, center = TRUE){
+  rafalib::mypar(1,5)
+  ## flip is because PCA chooses arbitrary sign for loadings and PC
+  colors = rev(RColorBrewer::brewer.pal(9, "RdBu"))
+  
+  pca <- prcomp(x, center = center)
+  if(center) z <- t(x) - rowMeans(t(x))
+  
+  cols <- 1:ncol(x)
+  rows <- 1:nrow(x)
+  image(cols, rows, z[,rev(1:ncol(z))], xaxt = "n", yaxt = "n", 
+        xlab="", ylab="", main= "X", col = colors)
+  abline(h=rows + 0.5, v = cols + 0.5)
+  rafalib::nullplot(xaxt="n",yaxt="n",bty="n")
+  text(0.5, 0.5, "=", cex = cex)
+  
+  z <- flip*t(pca$x)
+  image(cols, rows, z[,rev(1:ncol(z))], xaxt = "n", yaxt = "n",xlab="",ylab="", main= "Weights", col = colors)
+  abline(h=rows + 0.5, v = cols + 0.5)
+  rafalib::nullplot(xaxt="n",yaxt="n",bty="n")
+  text(0.5, 0.5, "x", cex = cex)
+  
+  z <- flip*pca$rotation
+  nz <- cbind(matrix(NA, ncol(z), pad), z, matrix(NA, ncol(z), pad))
+  rows <- 1:ncol(nz)
+  image(cols, rows, nz[,rev(1:ncol(nz))],  xaxt = "n", yaxt = "n", bty = "n", xlab="",ylab="", col = colors)
+  abline(h = pad+0:ncol(z)+1/2)
+  lines(c(ncol(z)/2+0.5,ncol(z)/2+1/2),c(pad,pad+ncol(z))+0.5)
+  text(ncol(z)/2+0.5, pad+ncol(z)+2 , expression(bold(Pattern^T)), font=2)
+}
+rafalib::mypar(1,1)
+illustrate_pca(x, flip = -1)
+```
+
+### `prcomp`
+
+R tiene una función específica para hacer esto. 
+
+```{r}
+library(rafalib)
+library(MASS)
+n <- 100
+set.seed(1)
+Y=t(mvrnorm(n,c(0,0), matrix(c(1,0.95,0.95,1),2,2)))
+mypar()
+thelim <- c(-3,3)
+plot(Y[1,], Y[2,], xlab="Twin 1 (standardized height)", 
+     ylab="Twin 2 (standardized height)", xlim=thelim, ylim=thelim)
+points(Y[1,1:2], Y[2,1:2], col=2, pch=16)
+pc<-prcomp(t(Y))
+```
+
+que, si los datos están estandarizados produce el mismo resultado que SVD. 
+
+```{r pca_svd, fig.cap="Plot showing SVD and prcomp give same results.",fig.width=10.5,fig.height=5.25}
+s <- svd( Y - rowMeans(Y) )
+mypar(1,2)
+for(i in 1:nrow(Y) ){
+  plot(pc$x[,i], s$d[i]*s$v[,i])
+}
+```
+
+Podemos encontrar los pesos con los que se combinan las variables haciendo:
+```{r}
+pc$rotation
+```
+y la varianza explicada en:
+
+```{r}
+pc$sdev
+```
+
+**NOTA: Usamos la transpuesta de `Y` porque `prcomp` asume el orden: units/samples en filas y los predictores/features en las columnas**
+
+## SVD y PCA en práctica usando R
+
+Usaremos los datos de expresión génica en tejidos para ver cómo aplicar todo esto en práctica
+
+```{r}
+library(devtools)
+#install_github("dagdata","genomicsclass")
+#library(dagdata)
+data(tissuesGeneExpression)
+library(rafalib)
+group <- as.fumeric(tab$Tissue)
+```
+
+
+En primer lugar queremos ver el PCA de las muestras:
+
+```{r}
+x <- t(e)
+pc <- prcomp(x)
+# ?prcomp
+names(pc)
+plot(pc$x[,1], pc$x[,2], col=group, main="PCA", xlab="PC1", ylab="PC2")
+```
+
+PCA es equivalente a calcular SVD en los datos centrados por columnas (una vez traspuesta nuetra matriz x tiene los genes en las columnas) Podemos usar la función _sweep_ para trabajar con filas y columnas eficientemente. 
+
+```{r}
+cx <- sweep(x, 2, colMeans(x), "-")
+sv <- svd(cx)
+names(sv)
+plot(sv$u[,1], sv$u[,2], col=group, main="SVD", xlab="U1", ylab="U2")
+```
+
+Las columnas de U de la descomposicion SVD se corresponden con las componentes principales de `x` en el PCA. Además la matriz V del SVD es equivalente a hacer la matriz de `rotacion` que nos devuelve`prcomp`.
+
+```{r}
+sv$v[1:5,1:5]
+pc$rotation[1:5,1:5]
+```
+
+Los elementos de la diagonal de D de la SVD son proporcionales a las desviaciones estandard del PCA con la excepcion de que las std de`prcomp` son muestrales  (con $n / (n - 1)$ correction). Los elementos de D son la suma de cuadrados de las componentes principales sin dividir por el tamaño muestral. 
+
+```{r}
+head(sv$d^2)
+head(pc$sdev^2)
+head(sv$d^2 / (ncol(e) - 1))
+```
+
+Si dividimos la varianza por la suma obtenemos un plot del radio de varianza explicada por cada componente principal:
+
+```{r}
+plot(sv$d^2 / sum(sv$d^2), xlim=c(0,15), type="b", pch=16,
+     xlab="principal components", 
+     ylab="variance explained")
+plot(sv$d^2 / sum(sv$d^2), type="b", pch=16,
+     xlab="principal components", 
+     ylab="variance explained")
+```
+
+Si no hubiéramos centrado los datos antes de hacer `svd` el plot habría sido algo distinto:
+
+```{r}
+svNoCenter <- svd(x)
+plot(pc$x[,1], pc$x[,2], col=group, main="PCA", xlab="PC1", ylab="PC2")
+points(0,0,pch=3,cex=4,lwd=4)
+plot(svNoCenter$u[,1], svNoCenter$u[,2], col=group, main="SVD not centered", xlab="U1", ylab="U2")
+```
+
+### SVA: Surrogate Variable Analysis 
+
+Si usamos SVD sobre la matriz en la que las muestras son las columnas estamos realizando SVA. Es equivalente al SVD de la traspuesta (las muestras son las filas) si no hacemos centering  
+
+```{r}
+sv2 <- svd(t(e))
+plot(sv2$u[,1], sv2$u[,2], col=group, main="samples vs genes (typical PCA)", xlab="U1", ylab="U2")
+sv1 <- svd(e)
+plot(sv1$v[,1], sv1$v[,2], col=group, main="genes vs samples (SVA)", xlab="V1", ylab="V2")
+```
+
+Como lo hagamos dependerá de nuestra pregunta. 
+
+
+## Aplicaciones de PCA
+
+###Iris Dataset: PCA to detect and remove collinearities
+
+El ejemplo Iris contiene  medidas botánicas para tres tipos de plantas diferentescon muchas observaciones para cada tipo. La pregunta final seria intentar construir un clasificador basado en estos cinco predictores para identificar los tipos de planta. Es esto posible? Primero queremos ver si los tres tipos de planta que hay se diferencian los unos de otros suficientemente en base a estos 5 predictores o si necesitamos recoger más datos. 
+
+```{r}
+names(iris)
+head(iris)
+dim(iris)
+```
+
+Vamos a calcular la distancia entre especies como hicimos con el ejemplo de los pokemon. Las cuatro primeras variables son numéricas, la quinta no y por eso la quitamos para calcular la distancia.
+
+```{r iris-distances, fig.height = 4, fig.width = 4}
+x <- iris[,1:4] %>% as.matrix()
+d <- dist(x)
+image(as.matrix(d), col = rev(RColorBrewer::brewer.pal(9, "RdBu")))
+```
+
+
+Parece que los predictores se agrupan en dos grupos en lugar de en tres. Vamos a ver si nuestros predictores estan correlacionados. 
+
+```{r}
+cor(x)
+```
+
+Vamos a aplicar PCA a la matriz de datos para ver si podemos ver nuestros datos en dos dimensiones en lugar de en las cinco que tenemos. Vemos cuanta variabilidad se explica con cada componente usando la función *summary*:
+
+```{r}
+pca <- prcomp(x)
+summary(pca)
+```
+
+La primera componente representa el 92% de la variabilidad y la segunda le añade otro 5% mas. La aproximación a dos dimensiones debería de ser suficientemente buena. Visualizamos los resultados del PCA:
+
+```{r illustrate-pca-twin-heights-iris, echo=FALSE, fig.height = 6, out.width="100%"}
+rafalib::mypar()
+illustrate_pca(x)
+```
+El primer _pattern_ consiste en Sepal Length,  Petal Length and Petal Width (rojo) en una direccion y Sepal Width en la otra (azul). El segundo patrón tiene Sepal Length y Petal Width en una direccion (azul) y las otras dos variables en la otra (rojo). Se ve claramente como los pesos de la primera componente principal son los que dominan todo, separando el primer tercio del heatmap (setosa) del segundo y el tercero (versicolor and virginica). La segunda columna de pesos separa ligeramente versicolor (rojo) de virgnica (azul).
+
+Pintamos la PCA
+
+```{r, iris-pca}
+data.frame(pca$x[,1:2], Species=iris$Species) %>% 
+  ggplot(aes(PC1,PC2, fill = Species))+
+  geom_point(cex=3, pch=21) +
+  coord_fixed(ratio = 1)
+```
+
+Las dos primeras componentes preservan la distancia:
+
+```{r dist-approx-4, fig.height = 4, fig.width = 4}
+d_approx <- dist(pca$x[, 1:2])
+qplot(d, d_approx) + geom_abline(color="red")
+```
+
+### MNIST Example
+
+Usemos un ejemplo en el que tenemos la intensidad de 784 pixels en imágenes de números escritos a mano. Podemos hacer algo con esto? Podemos crear nuevos algoritmos de ML con menos variables?
+Let's load the data:
+```{r}
+library(dslabs)
+if(!exists("mnist")) mnist <- read_mnist()
+```
+Este dataset se divide en 60.000 números para training y 10.000 para test. 
+Como los pixels están muy cerca podemos esperar que estén correlacionados y que por tanto podamos usar reducción de la dimensionalidad con ellos. 
+
+Probemos con PCA. Llevará un tiempo...
+
+```{r, cache=TRUE}
+col_means <- colMeans(mnist$test$images)
+pca <- prcomp(mnist$train$images)
+```
+
+```{r mnist-pca-variance-explained}
+pc <- 1:ncol(mnist$test$images)
+qplot(pc, pca$sdev)
+```
+
+Las primeras componentes explican mucha parte de la variabilidad:
+
+```{r}
+summary(pca)$importance[,1:5] 
+```
+
+Tomando una muestra de 2000 dígitos:
+
+```{r mnist-pca-1-2-scatter}
+data.frame(PC1 = pca$x[,1], PC2 = pca$x[,2],
+           label=factor(mnist$train$label)) %>%
+  sample_n(2000) %>% 
+  ggplot(aes(PC1, PC2, fill=label))+
+  geom_point(cex=3, pch=21)
+```
+
+Vamos a ver los pesos:
+
+```{r mnist-pca-1-4, out.width="100%", fig.height=3}
+library(RColorBrewer)
+tmp <- lapply( c(1:4,781:784), function(i){
+    expand.grid(Row=1:28, Column=1:28) %>%
+      mutate(id=i, label=paste0("PC",i), 
+             value = pca$rotation[,i])
+})
+tmp <- Reduce(rbind, tmp)
+tmp %>% filter(id<5) %>%
+  ggplot(aes(Row, Column, fill=value)) +
+  geom_raster() +
+  scale_y_reverse() +
+  scale_fill_gradientn(colors = brewer.pal(9, "RdBu")) +
+  facet_wrap(~label, nrow = 1)
+```
+
+Las PCs con menor varianza aparecen en las esquinas:
+
+```{r mnist-pca-last, out.width="100%", fig.height=3}
+tmp %>% filter(id>5) %>%
+  ggplot(aes(Row, Column, fill=value)) +
+  geom_raster() +
+  scale_y_reverse() +
+  scale_fill_gradientn(colors = brewer.pal(9, "RdBu")) +
+  facet_wrap(~label, nrow = 1)
+```
+
+Apliquemos ahora la transformacion obtenida en el training al test y corramos K-nearest neighbors en ese data set de dimensionalidad reducida.
+
+36 dimensiones explican el 80% de los datos:
+
+First fit the model:
+```{r,warning=F}
+library(caret)
+k <- 36
+x_train <- pca$x[,1:k]
+y <- factor(mnist$train$labels)
+fit <- knn3(x_train, y)
+```
+
+Transformamos el test:
+```{r}
+x_test <- sweep(mnist$test$images, 2, col_means) %*% pca$rotation
+x_test <- x_test[,1:k]
+```
+
+Predecimos:
+```{r}
+y_hat <- predict(fit, x_test, type = "class")
+confusionMatrix(y_hat, factor(mnist$test$labels))$overall["Accuracy"]
+```
+
+
+## Ejercicios 
+
+Vamos a explorar el dataset `tissue_gene_expression`  
+
+
+    ```{r, eval=FALSE}
+    data("tissue_gene_expression")
+    dim(tissue_gene_expression$x)
+    ```
+
+Queremos saber que muestras de esas 189 se parecen mas en base a la expresion de esos 500 genes. Pinta las dos primeras componentes con colores que representen el tipo de tejido.
+
+    
+2. Los predictores (genes) para cada muestra se han medido con la misma máquina. Ver si existe algun sesgo en las muestras calculando la media de las observaciones de cada muestra y pintandolas contra la primera componente, coloreadas por el tipo de tejido. Cual es la correlacion? 
+
+3. Se ve un sesgo. Re-calcula la PCA despues de haber centrado los datos. 
+
+4. Dibuja un boxplot mostrando el valor de cada tejido en las diez primeras componentes. 
+  
+5. Dibuja el % de varianza explicada por cada PC. Hint: use the `summary` function.
+
+
+## Non-lineal projections: t-sne
+
+t-sne utiliza probabilidades condicionales en lugar de distancias euclídeas. 
+
+Si comparamos el PCA y el t-sne para el data set MNIST vemos como t-sne es capaz de capturar en 2 dimensiones lo que PCA en muchas mas
+
+```{r, eval=FALSE}
+library(dplyr)
+library(Rtsne)
+library(dslabs)
+if(!exists("mnist")) mnist <- read_mnist()
+
+train_full <- mnist$train$images
+train <- sample_frac(as.data.frame(train_full),0.33)
+
+## Curating the database for analysis with both t-SNE and PCA
+label<-mnist$train$label
+## for plotting
+colors = rainbow(10)
+names(colors) = unique(label)
+
+## Executing the algorithm on curated data
+tsne <- Rtsne(train[,-1], dims = 2, 
+              perplexity=30, 
+              verbose=TRUE, 
+              max_iter = 500,
+              col=label)
+exeTimeTsne<- system.time(Rtsne(train[,-1], dims = 2, perplexity=30, verbose=TRUE, max_iter = 500))
+
+plot(tsne$Y, t='n', main="tsne")
+
+text(tsne$Y, labels=label, col=colors[label])
+
+```
+![Supervised vs Unsupervised learning](Images/tsne.png)
+
+
+# Clustering 
+
+Utilizaremos el dataset de expresión génica:
+
+```{r}
+library(tissuesGeneExpression)
+data(tissuesGeneExpression)
+```
+
+Calculamos la distancia entre muestras
+
+```{r}
+d <- dist( t(e) )
+```
+
+## Hierarchical clustering
+
+Sabemos la distancia, pero...como se relacionan entre ellos? Clustering jierarquico compara dos a dos los perfiles y comienza agregando aquellos mas parecidos. COn ese nuevo perfil de dos, busca el tercero mas cercano y asi iterativamente.  
+
+La funcion $hclust$ genera los grupos a partir de las distancias. Ese objeto (un árbol) puede ser después pintado.
+
+```{r dendrogram, fig.cap="Dendrogram showing hierarchical clustering of tissue gene expression data.",fig.width=10.5,fig.height=5.25}
+library(rafalib)
+mypar()
+hc <- hclust(d)
+hc
+plot(hc,labels=tissue,cex=0.5)
+```
+
+Podemos identificar las muestras agrupadas por tejido? Usamos `myplclust` para colorear. 
+ 
+```{r color_dendrogram, fig.cap="Dendrogram showing hierarchical clustering of tissue gene expression data with colors denoting tissues.",fig.width=10.5,fig.height=5.25}
+myplclust(hc, labels=tissue, lab.col=as.fumeric(tissue), cex=0.5)
+```
+
+Parece que si. Pero necesitamos definir clusters...cortando el árbol. Dibujamos una linea a 120 y vemos que grupos se desconectan:
+
+```{r color_dendrogram2, fig.cap="Dendrogram showing hierarchical clustering of tissue gene expression data with colors denoting tissues. Horizontal line defines actual clusters.",fig.width=10.5,fig.height=5.25}
+myplclust(hc, labels=tissue, lab.col=as.fumeric(tissue),cex=0.5)
+abline(h=120)
+```
+
+Vemos cual es el overlap de estos grupos con sus grupos reales:
+
+```{r}
+hclusters <- cutree(hc, h=120)
+table(true=tissue, cluster=hclusters)
+```
+
+`cutree` identifica los clusters para un número determinado de clusters:
+
+```{r}
+hclusters <- cutree(hc, k=8)
+table(true=tissue, cluster=hclusters)
+```
+
+En general tenemos una asociacion tejido-cluster. 
+
+## K-means
+
+k-means detecta no asociaciones entre muestras sino directamente grupos de muestras (o de genes):
+
+```{r kmeans, fig.cap="Plot of gene expression for first two genes (order of appearance in data) with color representing tissue (left) and clusters found with kmeans (right).",fig.width=10.5,fig.height=5.25}
+set.seed(1)
+km <- kmeans(t(e[1:2,]), centers=7)
+names(km)
+mypar(1,2)
+plot(e[1,], e[2,], col=as.fumeric(tissue), pch=16)
+plot(e[1,], e[2,], col=km$cluster, pch=16)
+```
+
+El color representa el tejido real en el primer plot y en el segundo el color representa el cluster definido por kmeans. No ha funcionado muy bien:
+
+```{r}
+table(true=tissue,cluster=km$cluster)
+```
+
+Tiene sentido que usar solo 2 genes no sea suficiente. Si usamos todos los genes y lo visualizamos con MDS:
+
+
+```{r kmeans_mds, fig.cap="Plot of gene expression for first two PCs with color representing tissues (left) and clusters found using all genes (right).",fig.width=10.5,fig.height=5.25}
+km <- kmeans(t(e), centers=7)
+mds <- cmdscale(d)
+mypar(1,2)
+plot(mds[,1], mds[,2]) 
+plot(mds[,1], mds[,2], col=km$cluster, pch=16)
+```
+
+By tabulating the results, we see that we obtain a similar answer to that obtained with hierarchical clustering.
+
+```{r}
+table(true=tissue,cluster=km$cluster)
+```
+
+
+## Heatmaps
+
+```{r}
+library(RColorBrewer) 
+hmcol <- colorRampPalette(brewer.pal(9, "GnBu"))(100)
+```
+
+Nos quedamos con los genes mas informativos, los que tienen una varianza muy alta
+
+```{r, message=FALSE}
+library(genefilter)
+rv <- rowVars(e)
+idx <- order(-rv)[1:40]
+```
+Usamos la libreria ComplexHeatmap para crear un heatmap:
+
+```{r, message=FALSE}
+library(ComplexHeatmap)
+Heatmap(e[idx,],show_column_names = F,show_row_names = F)
+```
+
+Podemos a la vez hacerlo con kmeans
+```{r, message=FALSE}
+Heatmap(e[idx,],show_column_names = F,show_row_names = F,km=4)
+```
