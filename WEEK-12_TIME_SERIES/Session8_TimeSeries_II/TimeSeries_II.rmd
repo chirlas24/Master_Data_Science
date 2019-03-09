@@ -1,0 +1,47 @@
+---
+title: "Time Series Analysis: Forecasting"
+author: "FSC"
+date: "March 9, 2019"
+output:
+  pdf_document: 
+    toc: true
+    toc_depth: 5
+  html_document: 
+    toc: true
+    toc_depth: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Predicciones usando series temporales
+
+## Average method
+Predice el futuro en función de la media de los valores que ya han ocurrido. Es útil en series temporales estacionarias donde ni la media ni la variabilidad cambian significativamente
+
+```{r}
+library(fpp2)
+kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat",skip=3)
+kingstimeseries <- ts(kings)
+kingstimeseries
+ts.plot(kingstimeseries)
+meanf(kingstimeseries,20)[1:10]
+autoplot(meanf(kingstimeseries,20))
+```
+
+## Naïve method
+Se predice la siguiente observación con el último valor de la serie. Funciona bien para $random walk$ time series: series temporales en los que dónde sucederá el siguiente punto es un proceso aleatorio $y_t-y_{t-1}=\epsilon$
+
+```{r}
+autoplot(naive(kingstimeseries, 5))
+#autoplot(rwf(kingstimeseries, 5))
+```
+## Seasonal Naïve method
+
+
+## Drift method
+
+# Predicciones usando modelos longitudinales
+
+
+
